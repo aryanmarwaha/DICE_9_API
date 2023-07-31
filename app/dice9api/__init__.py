@@ -2,7 +2,8 @@ from flask import Flask,render_template,request,url_for,Blueprint
 from flask_mail import Mail, Message
 
 from cryptography.fernet import Fernet
-import mysql.connector,datetime,hashlib,json,os
+import mysql.connector,datetime
+import hashlib,json,os
 
 from secrets import token_hex
 
@@ -15,7 +16,7 @@ app.config.update(
 	MAIL_USE_SSL=True,
 	MAIL_USERNAME = os.environ.get('MAIL_SERVER_EMAILID'),
 	MAIL_PASSWORD = os.environ.get('MAIL_SERVER_EMAIL_PASSWORD')
-	)
+)
 mail = Mail(app)
 
 enc_key = os.environ.get('ENCRYPTION_KEY').encode()
@@ -23,7 +24,7 @@ fernet = Fernet(enc_key)
 
 def establish_connection():
 	mydb = mysql.connector.connect(
-		host='127.0.0.1',
+		host='localhost',
 		user='root',
 		password='root',
 		database='dice_9_'

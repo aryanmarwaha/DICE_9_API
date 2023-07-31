@@ -13,7 +13,7 @@ def send_email_verification_otp(useremail, otp_token):
 			msg.html = render_template("mail_verify_otp.html", otp_token=otp_token)
 			mail.send(msg)
 			return
-		except:
+		except Exception as e:
 			ttl-=1
 			if ttl==0:
 				raise ValueError("Mail Not Send")
