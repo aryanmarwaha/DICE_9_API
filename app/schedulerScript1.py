@@ -10,32 +10,28 @@ def establish_connection():
 	return mydb
 
 # Main
+
+# Clearing cache_dice9_
+print("-"*80)
+print("    CLEARING : cache_dice9_ ...")
+print(" *  Date_Time : "+str(date_time))
+
 mydb = establish_connection()
 mycursor = mydb.cursor()
 
 date_time = datetime.datetime.now()
 
 date_time1 = date_time - datetime.timedelta(minutes=8)
-sql = f"DELETE FROM dice_9_.enroll_mail_cache WHERE date_time < '{date_time1}'"
+sql = f"DELETE FROM cache_dice9_.verify_email WHERE date_time < '{date_time1}'"
 mycursor.execute(sql)
-
-print("----------------------------------------------------------")
-print("    CLEARING : TABLE 'enroll_mail_cache' ...")
-print(" *  Date_Time : "+str(date_time))
-print(" *  Total Rows Effected :"+str(mycursor.rowcount)+"\n")
-print("    TABLE 'enroll_mail_cache' : CLEARED Successfully ..!!!")
-print("----------------------------------------------------------")
 
 date_time2 = date_time - datetime.timedelta(days=8)
-sql = f"DELETE FROM dice_9_.waiting_staff_cache WHERE date_time < '{date_time2}'"
+sql = f"DELETE FROM cache_dice9_.pending_req_staff WHERE date_time < '{date_time2}'"
 mycursor.execute(sql)
-
-print("----------------------------------------------------------")
-print("    CLEARING : TABLE 'waiting_staff_cache' ...")
-print(" *  Date_Time : "+str(date_time))
-print(" *  Total Rows Effected :"+str(mycursor.rowcount)+"\n")
-print("    TABLE 'waiting_staff_cache' : CLEARED Successfully ..!!!")
-print("----------------------------------------------------------")
 
 mydb.commit()
 mydb.disconnect()
+
+print("    Cleared Successfully ..!!!")
+print("-"*80)
+
