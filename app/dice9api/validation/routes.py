@@ -28,7 +28,7 @@ def verify_email():
 		mycursor= mydb.cursor()
 
 		#User Validation
-		sql = "SELECT date_time FROM dice_9_.email_verification_cache WHERE useremail = %s AND secret_Token = %s"
+		sql = "SELECT date_time FROM cache_dice9_.verify_email WHERE useremail = %s AND secret_Token = %s"
 		values = (req.useremail,req.otp)
 		mycursor.execute(sql,values)
 		enroll_dt = mycursor.fetchall()
@@ -39,7 +39,7 @@ def verify_email():
 			return json.dumps({'success': 'false', 'msg': "Bad Parameters"})
 		
 		elif (date_time-enroll_dt[0][0]).total_seconds() > 480 :
-			sql = "DELETE FROM dice_9_.email_verification_cache WHERE useremail ='{}'"
+			sql = "DELETE FROM cache_dice9_.verify_email WHERE useremail ='{}'"
 			sql = sql.format(req.useremail)
 			mycursor.execute(sql)
 
@@ -52,7 +52,7 @@ def verify_email():
 		paswd_ = token_hex(16)
 		
 		#SQL Injection
-		sql = "DELETE FROM dice_9_.email_verification_cache WHERE useremail ='{}'"
+		sql = "DELETE FROM cache_dice9_.verify_email WHERE useremail ='{}'"
 		sql = sql.format(req.useremail)
 		mycursor.execute(sql)
 		mycursor.fetchall()
@@ -74,9 +74,10 @@ def verify_email():
 def approve_staff_req():
 	# Parameter Initialisation
 	try:
-		obj = Staff_Req(request)
+		req = Staff_Req(request)
 		date_time = datetime.datetime.now()
 	except:
+		print("yo")
 		return render_template('failed_action.html', title="Failure", msg="Access denied!",
 			reply="{'success': 'false', 'msg': 'Bad Parameters'}")
 	try:
@@ -90,12 +91,13 @@ def approve_staff_req():
 
 		admin_name = mycursor.fetchall()
 		if mycursor.rowcount == 0:
+			print("ho")
 			return render_template('failed_action.html', title="Failure", msg="Access denied!",
 				reply="{'success': 'false', 'msg': 'Bad Parameters'}")
 		admin_name = admin_name[0][0]
 
 		#User Validation
-		sql = "SELECT date_time from dice_9_.waiting_staff_cache WHERE useremail = '{}' AND request_id='{}'"
+		sql = "SELECT date_time from cache_dice9_.pending_req_staff WHERE useremail = '{}' AND request_id='{}'"
 		sql = sql.format(req.useremail,req.u_token)
 		mycursor.execute(sql)
 		res_dt = mycursor.fetchall()
@@ -105,7 +107,7 @@ def approve_staff_req():
 				reply="{'success': 'false', 'msg': 'Bad Parameters'}")
 
 		elif (date_time-res_dt[0][0]).days >= 2 :
-			sql = "DELETE FROM dice_9_.waiting_staff_cache WHERE useremail ='{}'"
+			sql = "DELETE FROM cache_dice9_.pending_req_staff WHERE useremail ='{}'"
 			sql = sql.format(req.useremail)
 			mycursor.execute(sql)
 
@@ -117,24 +119,24 @@ def approve_staff_req():
 		# Switching User from guest to staff
 		
 		# Deleting user-entry from waiting_staff_chache
-		sql = "DELETE FROM dice_9_.waiting_staff_cache where useremail = '{}'"
+		sql = "DELETE FROM cache_dice9_.pending_req_staff where useremail = '{}'"
 		sql = sql.format(req.useremail)
 		mycursor.execute(sql)
 
 		# fetching user-details from guest_user_info
-		sql = "SELECT * FROM dice_9_.guest_user_info where useremail = '{}'"
+		sql = "SELECT * FROM dice_9_.guest_info where useremail = '{}'"
 		sql = sql.format(req.useremail)
 		mycursor.execute(sql)
 		user_data = mycursor.fetchall()[0]
 
 		# Deleting user-entry from guest_user_info
-		sql = "DELETE FROM dice_9_.guest_user_info where useremail = '{}'"
+		sql = "DELETE FROM dice_9_.guest_info where useremail = '{}'"
 		sql = sql.format(req.useremail)
 		mycursor.execute(sql)
 
 		#SQL Injection
 		sql = """
-			INSERT INTO dice_9_.staff_user_info (useremail,first_name,second_name,
+			INSERT INTO dice_9_.staff_info (useremail,first_name,second_name,
 			age,gender,approved_by,approved_at) VALUES(%s,%s,%s,%s,%s,%s,%s)"""
 		values = (nullSafe(user_data[0]),nullSafe(user_data[1]),nullSafe(user_data[2]),
 			nullSafe(user_data[3]),nullSafe(user_data[4]),admin_name,date_time)
@@ -160,7 +162,7 @@ def approve_staff_req():
 def reject_staff_req():
 	# Parameter Initialisation
 	try:
-		obj = Staff_Req(request)
+		req = Staff_Req(request)
 		date_time = datetime.datetime.now()
 	except:
 		return render_template('failed_action.html', title="Failure", msg="Access denied!",
@@ -180,7 +182,7 @@ def reject_staff_req():
 		admin_name = admin_name[0][0]
 
 		#User Validation
-		sql = "SELECT useremail from dice_9_.waiting_staff_cache WHERE useremail = '{}' AND request_id = '{}'"
+		sql = "SELECT useremail from cache_dice9_.pending_req_staff WHERE useremail = '{}' AND request_id = '{}'"
 		sql = sql.format(req.useremail,req.u_token)
 		mycursor.execute(sql)
 		res_dt = mycursor.fetchall()
@@ -189,7 +191,7 @@ def reject_staff_req():
 				reply="{'success': 'false', 'msg': 'Bad Parameters'}")
 
 		# Deleting user-entry from waiting_staff_chache
-		sql = "DELETE FROM dice_9_.waiting_staff_cache where useremail = '{}'"
+		sql = "DELETE FROM cache_dice9_.pending_req_staff where useremail = '{}'"
 		sql = sql.format(req.useremail)
 		mycursor.execute(sql)
 

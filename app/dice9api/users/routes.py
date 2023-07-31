@@ -19,23 +19,17 @@ users = Blueprint('users',__name__,template_folder="templates")
 def reset():
 	mydb = establish_connection()
 	mycursor = mydb.cursor()
-
 	sql = "DELETE FROM dice_9_.verified_users"
 	mycursor.execute(sql)
-
-	sql = "DELETE FROM dice_9_.student_user_info"
+	sql = "DELETE FROM dice_9_.student_info"
 	mycursor.execute(sql)
-
-	sql = "DELETE FROM dice_9_.guest_user_info"
+	sql = "DELETE FROM dice_9_.guest_info"
 	mycursor.execute(sql)
-
-	sql = "DELETE FROM dice_9_.staff_user_info"
+	sql = "DELETE FROM dice_9_.staff_info"
 	mycursor.execute(sql)
-
-	sql = "DELETE FROM dice_9_.waiting_staff_cache"
+	sql = "DELETE FROM cache_dice9_.pending_req_staff"
 	mycursor.execute(sql)
-
-	sql = "DELETE FROM dice_9_.email_verification_cache"
+	sql = "DELETE FROM cache_dice9_.verify_email"
 	mycursor.execute(sql)
 	mydb.commit()
 	return "done"
@@ -67,12 +61,12 @@ def enroll_user():
 
 		#Inserting/Updating Secret-Token In Database
 		try:
-			sql = "INSERT INTO dice_9_.email_verification_cache (useremail,date_time,secret_Token) VALUES(%s,%s,%s)"
+			sql = "INSERT INTO cache_dice9_.verify_email (useremail,date_time,secret_Token) VALUES(%s,%s,%s)"
 			values = (user.useremail, date_time, secretToken)
 			mycursor.execute(sql,values)
 
 		except mysql.connector.errors.IntegrityError:
-			sql = "UPDATE dice_9_.email_verification_cache SET date_time = %s, secret_Token = %s WHERE useremail = %s"
+			sql = "UPDATE cache_dice9_.verify_email SET date_time = %s, secret_Token = %s WHERE useremail = %s"
 			values = (date_time, secretToken, user.useremail)
 			mycursor.execute(sql,values)
 
@@ -115,7 +109,7 @@ def register():
 		if user.role == '0':
 			student = RegisteringStudent(request)
 			sql = """
-			INSERT INTO dice_9_.student_user_info (useremail,first_name,second_name,
+			INSERT INTO dice_9_.student_info (useremail,first_name,second_name,
 					age,gender,roll_no,branch,hosteler,address,interest_ids,skill_ids,
 					open_to_work) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
 			values = (user.useremail,user.firstname,user.secondname,user.age,user.gender,
@@ -129,7 +123,7 @@ def register():
 			#user.role==2: staff
 			token = token_hex(16)
 			if user.role == '2':
-				sql = """INSERT INTO dice_9_.waiting_staff_cache (useremail,date_time,
+				sql = """INSERT INTO cache_dice9_.pending_req_staff (useremail,date_time,
 						request_id) Values(%s,%s,%s)"""
 				values = (user.useremail,date_time,token)
 				mycursor.execute(sql,values)
@@ -139,7 +133,7 @@ def register():
 			# user.role==1: guest (DEFAULT)
 			user.role = '1'
 			sql = """
-			INSERT INTO dice_9_.guest_user_info (useremail,first_name,second_name,
+			INSERT INTO dice_9_.guest_info (useremail,first_name,second_name,
 					age,gender) VALUES(%s,%s,%s,%s,%s)"""
 			values = (user.useremail,user.firstname,user.secondname,user.age,
 					user.gender)
