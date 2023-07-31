@@ -1,0 +1,36 @@
+{% extends "mail_layout.html" %}
+{% block mail_content %}
+<div align="left" style="width: 600px; min-height: 600px; background-color: #FFFF;">
+	<center>
+		<img src="https://github.com/aryanmarwaha/aryanmarwaha/assets/102375260/17bb1ef7-d27f-460e-a92c-4e9357e59a1b" style="width:160px;">
+	</center>
+	<div style="margin-left: 50px;width: 500px; font-size: 1.2rem; font-family: Arial; color: darkslategray;">
+		<p><span style="font-weight: 600; font-size: 1.3rem;">Hi {{admin_name}},</span>
+			<br><br>
+			You got a request from <span style="color: #0434E0;">{{user_name}}</span>, interested in joining the <b>DICE Platform</b> as in <span style="color: #CA6100;"><b>"{{role}}"</b></span> role. The specifics are discussed further down. Please take an action at your earliest interim. Thankyou 🙏</p>
+		<br>
+		<label>Email address : <span style="color: #0434E0; font-weight: 500;">{{useremail}}</span></label>
+		<br>
+		<label>Date and time : <span style="color: #0434E0; font-weight: 500;">{{date_time}}</span></label>
+		<br>
+		<label>Requested Role: <span style="color: #CA6100; font-weight: 500;"><b>"{{role}}"</b></span></label><br><br>
+		<center style="border-top: 2px solid grey;padding-top: 1.2rem; padding-bottom: 1.2rem;">
+
+			<label style="margin-bottom: 10px; display: inline-block; font-size: 0.9rem;">*Please note that requests are automatically denied if they are not accepted within two days.</label>
+			<br>
+			<form action="http://127.0.0.1:5000/api/approve_staff_req" method="POST" style="display: inline-block;">
+				<input name="a_token" value="{{a_token}}" style="display: none;"readonly type="hidden">
+
+				<button style="border: 0px;margin-top: 0.5rem; background-color: #0434E0; color: white; font-size: 1.2rem; padding: 6px;padding-left: 30px; padding-right: 30px; border-radius:4px;">Approve</button>
+			</form>
+			<form action="http://127.0.0.1:5000/api/reject_staff_req" method="POST" style="display: inline-block;">
+				<input name="a_token" value="{{a_token}}" style="display: none;"readonly type="hidden">
+
+				<button style="border:1px solid #0434E0; background-color: white; color: #0434E0; font-size: 1.2rem; padding: 5px;padding-left: 30px; padding-right: 30px; border-radius:4px;">Reject</button>
+			</form>
+
+		</center>
+		<br>
+	</div>
+</div>
+{% endblock %}

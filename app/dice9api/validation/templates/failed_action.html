@@ -1,0 +1,6 @@
+{% extends "response_layout.html" %}
+{% block response_block %}
+	<img src="../static/svg/validation_failure_img.svg" style="width: 8rem;">
+	<br><br><br>
+	<label>It seems your action ended up as <b style="color: orange;">Failure</b>. {{msg}}</label>
+{% endblock %}

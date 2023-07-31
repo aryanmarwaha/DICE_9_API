@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	{% if title %}
+	<title>{{title}}</title>
+	{% else %}
+	<title>response</title>
+	{% endif %}
+	
+	<style type="text/css">
+		body::-webkit-scrollbar {
+			width: 0;
+			background-color: transparent;
+		}
+		#console_div{
+			display: none;
+		}
+		#console{
+			padding: 10px 10px 5px 10px;
+			max-width: 580px;
+			min-width: 580px;
+			min-height: 50px;
+			overflow: auto;
+			font-size: 1.1rem;
+			font-family: 'Arial';
+			color: lightgreen;
+			background-color: #212121;
+			border: 0px;
+			letter-spacing: 1.1px;
+        }
+		#console::-webkit-scrollbar {
+			width: 6px;
+		}
+		#console::-webkit-scrollbar-track {
+			background: darkslategray;
+		}
+		#console::-webkit-scrollbar-thumb {
+			background: grey;
+		}
+	</style>
+</head>
+<body style="background-color: #FFFAE9;">
+	<center>
+		<div align="left" style="width: 600px; min-height: 200px; background-color: #FFFF;">
+			<div style="display: block;">
+				<img src="../static/images/diceimg.png" style="width:160px; margin: 15px 0px 5px 50px;">
+				<abbr title="Developer options"><div style="margin: 36px 50px 5px 0px; float: right; display: flex; align-items: center; flex-direction: column;" id="console_button">
+					<div style="background-color: grey; height: 10px;width: 10px; border-radius: 50%; margin: 1px;"></div>
+					<div style="background-color: grey; height: 10px;width: 10px; border-radius: 50%; margin: 1px;"></div>
+					<div style="background-color: grey; height: 10px;width: 10px; border-radius: 50%; margin: 1px;"></div>
+				</div></abbr>
+			</div>
+			<div style="margin-left: 50px;width: 500px; font-size: 1.2rem; font-family: Arial; color: darkslategray;">
+				<center style="border-top: 2px solid grey;padding-top: 1.2rem; padding-bottom: 1.2rem;">
+					{% block response_block %}{% endblock %}
+					<br><br>
+					<label style="margin-bottom: 10px; display: inline-block; font-size: 0.9rem;">*If you need assistance or have any questions, please don't hesitate to reach out.</label>
+				</center>
+				<br>
+			</div>
+		</div>
+		<br>
+		<div align="left" style="width: 600px; min-height: auto; background-color: #FFFF;" id="console_div">
+			<div align="left" style="width: 600px; height: 20px; background-color: darkolivegreen;"></div>
+			<textarea id="console">{{reply}}</textarea>
+		</div>
+		<p style="display: inline-block;position: relative; bottom: 0px; margin: 10px; font-family: Arial; font-size: 1rem;">
+			Department of Interdisciplinary Courses in Engineering (DICE)
+			<br>
+			Chitkara University, Rajpura Punjab, India
+			<br>
+			<br>
+		</p>
+	</center>
+	<script type="text/javascript">
+		console_button = document.getElementById('console_button');
+		console_div = document.getElementById('console_div');
+
+		console_button.addEventListener('click', function() {
+			if(console_div.style.display=='none'){
+				console_div.style.display = 'block';
+			}
+			else{
+				console_div.style.display = 'none';
+			}
+		});
+	</script>
+</body>
+</html>
