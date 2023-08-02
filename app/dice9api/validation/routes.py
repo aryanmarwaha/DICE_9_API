@@ -57,7 +57,7 @@ def verify_email():
 		mycursor.execute(sql)
 		mycursor.fetchall()
 		
-		sql = "INSERT INTO dice_9_.verified_users (useremail,email_verified_at,password,app_token,web_token) VALUES(%s,%s,%s,%s,%s)"
+		sql = "INSERT INTO users_dice9_.verified_users (useremail,email_verified_at,password,app_token,web_token) VALUES(%s,%s,%s,%s,%s)"
 		values = (req.useremail,date_time,paswd_,token_,token_)
 		mycursor.execute(sql,values)
 		mycursor.fetchall()
@@ -67,7 +67,7 @@ def verify_email():
 		return json.dumps({'success': 'true', 'msg': "Email Verification Successful", 'token': token_})
 	except Exception as e:
 		print(e)
-		return json.dumps({'success': 'false', 'msg': "Internal Server Error"})
+		return json.dumps({'success': 'false', 'msg': "Some Error Occured"})
 
 
 @validate.route("/api/approve_staff_req",methods=['POST'])
@@ -85,7 +85,7 @@ def approve_staff_req():
 		mycursor = mydb.cursor()
 
 		#Admin Validation
-		sql = "SELECT user_name FROM dice_9_.admin WHERE user_key = '{}'"
+		sql = "SELECT user_name FROM users_dice9_.admin WHERE user_key = '{}'"
 		sql = sql.format(req.admin_token)
 		mycursor.execute(sql)
 
@@ -124,26 +124,26 @@ def approve_staff_req():
 		mycursor.execute(sql)
 
 		# fetching user-details from guest_user_info
-		sql = "SELECT * FROM dice_9_.guest_info where useremail = '{}'"
+		sql = "SELECT * FROM users_dice9_.guest_info where useremail = '{}'"
 		sql = sql.format(req.useremail)
 		mycursor.execute(sql)
 		user_data = mycursor.fetchall()[0]
 
 		# Deleting user-entry from guest_user_info
-		sql = "DELETE FROM dice_9_.guest_info where useremail = '{}'"
+		sql = "DELETE FROM users_dice9_.guest_info where useremail = '{}'"
 		sql = sql.format(req.useremail)
 		mycursor.execute(sql)
 
 		#SQL Injection
 		sql = """
-			INSERT INTO dice_9_.staff_info (useremail,first_name,second_name,
+			INSERT INTO users_dice9_.staff_info (useremail,first_name,second_name,
 			age,gender,approved_by,approved_at) VALUES(%s,%s,%s,%s,%s,%s,%s)"""
 		values = (nullSafe(user_data[0]),nullSafe(user_data[1]),nullSafe(user_data[2]),
 			nullSafe(user_data[3]),nullSafe(user_data[4]),admin_name,date_time)
 		mycursor.execute(sql,values)
 
 		#Updating role
-		sql = "UPDATE dice_9_.verified_users SET role = 2 where useremail = '{}'"
+		sql = "UPDATE users_dice9_.verified_users SET role = 2 where useremail = '{}'"
 		sql = sql.format(req.useremail)
 		mycursor.execute(sql)
 
@@ -154,8 +154,8 @@ def approve_staff_req():
 	except Exception as e:
 		print(str(e))
 		mydb.disconnect()
-		return render_template('failed_action.html', title="Internal Server Error", msg="Try Again!",
-			reply="{'success': 'false', 'msg': 'Internal Server Error: '"+str(e)+"}")
+		return render_template('failed_action.html', title="Some Error Occured", msg="Try Again!",
+			reply="{'success': 'false', 'msg': 'Some Error Occured: '"+str(e)+"}")
 
 
 @validate.route("/api/reject_staff_req", methods=['POST'])
@@ -172,7 +172,7 @@ def reject_staff_req():
 		mycursor = mydb.cursor()
 
 		#Admin Validation
-		sql = "SELECT user_name FROM dice_9_.admin WHERE user_key = '{}'"
+		sql = "SELECT user_name FROM users_dice9_.admin WHERE user_key = '{}'"
 		sql = sql.format(req.admin_token)
 		mycursor.execute(sql)
 		admin_name = mycursor.fetchall()
@@ -202,4 +202,4 @@ def reject_staff_req():
 	except Exception as e:
 		mydb.disconnect()
 		return render_template('failed_action.html', title="Failure", msg="Try Again!",
-			reply="{'success': 'false', 'msg': 'Internal Server Error: '"+str(e)+"}")
+			reply="{'success': 'false', 'msg': 'Some Error Occured: '"+str(e)+"}")

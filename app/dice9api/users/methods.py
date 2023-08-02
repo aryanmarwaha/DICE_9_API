@@ -25,7 +25,7 @@ def send_staff_request(mydb,username, useremail, token):
 		try:
 			# SQL --fetch admins
 			mycursor = mydb.cursor()
-			mycursor.execute("SELECT useremail,user_name,user_key from dice_9_.admin")
+			mycursor.execute("SELECT useremail,user_name,user_key from users_dice9_.admin")
 			admins_ = mycursor.fetchall()
 
 			#Parameter Intitialization
@@ -40,7 +40,7 @@ def send_staff_request(mydb,username, useremail, token):
 				#encryption-rule: "request_id|*|admin_token|*|useremail"
 				t_token = token + '|*|' + admin[2] + '|*|' + useremail
 				a_token = fernet.encrypt(t_token.encode()).decode()
-				print(a_token)
+				
 				msg = Message(subject, sender=sender, recipients=[admin[0]])
 				msg.html = render_template("role_request.html",admin_name=admin[1],
 											user_name=username,useremail=useremail,

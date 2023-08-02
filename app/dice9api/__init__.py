@@ -27,7 +27,7 @@ def establish_connection():
 		host='localhost',
 		user='root',
 		password='root',
-		database='dice_9_'
+		database='users_dice9_'
 	)
 	return mydb
 

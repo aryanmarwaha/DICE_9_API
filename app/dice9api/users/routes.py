@@ -19,13 +19,13 @@ users = Blueprint('users',__name__,template_folder="templates")
 def reset():
 	mydb = establish_connection()
 	mycursor = mydb.cursor()
-	sql = "DELETE FROM dice_9_.verified_users"
+	sql = "DELETE FROM users_dice9_.verified_users"
 	mycursor.execute(sql)
-	sql = "DELETE FROM dice_9_.student_info"
+	sql = "DELETE FROM users_dice9_.student_info"
 	mycursor.execute(sql)
-	sql = "DELETE FROM dice_9_.guest_info"
+	sql = "DELETE FROM users_dice9_.guest_info"
 	mycursor.execute(sql)
-	sql = "DELETE FROM dice_9_.staff_info"
+	sql = "DELETE FROM users_dice9_.staff_info"
 	mycursor.execute(sql)
 	sql = "DELETE FROM cache_dice9_.pending_req_staff"
 	mycursor.execute(sql)
@@ -47,7 +47,7 @@ def enroll_user():
 		mycursor= mydb.cursor()
 
 		#Validating User
-		sql = "SELECT useremail FROM dice_9_.verified_users WHERE useremail = '{}'"
+		sql = "SELECT useremail FROM users_dice9_.verified_users WHERE useremail = '{}'"
 		sql = sql.format(user.useremail)
 		mycursor.execute(sql)
 		mycursor.fetchall()
@@ -79,7 +79,7 @@ def enroll_user():
 	except ValueError as e:
 		return json.dumps({'success': 'false', 'msg': str(e)})
 	except Exception as e:
-		return json.dumps({'success': 'false', 'msg': "Internal Server Error"+str(e)})
+		return json.dumps({'success': 'false', 'msg': "Some Error Occured"+str(e)})
 
 
 @users.route("/api/register",methods=['POST'])
@@ -96,7 +96,7 @@ def register():
 		mycursor = mydb.cursor()
 
 		#User Validation
-		sql = "SELECT useremail FROM dice_9_.verified_users WHERE useremail = %s AND app_token = %s AND register_dt IS NULL"
+		sql = "SELECT useremail FROM users_dice9_.verified_users WHERE useremail = %s AND app_token = %s AND register_dt IS NULL"
 		values = (user.useremail,user.token)
 		mycursor.execute(sql,values)
 		mycursor.fetchall()
@@ -109,7 +109,7 @@ def register():
 		if user.role == '0':
 			student = RegisteringStudent(request)
 			sql = """
-			INSERT INTO dice_9_.student_info (useremail,first_name,second_name,
+			INSERT INTO users_dice9_.student_info (useremail,first_name,second_name,
 					age,gender,roll_no,branch,hosteler,address,interest_ids,skill_ids,
 					open_to_work) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
 			values = (user.useremail,user.firstname,user.secondname,user.age,user.gender,
@@ -133,7 +133,7 @@ def register():
 			# user.role==1: guest (DEFAULT)
 			user.role = '1'
 			sql = """
-			INSERT INTO dice_9_.guest_info (useremail,first_name,second_name,
+			INSERT INTO users_dice9_.guest_info (useremail,first_name,second_name,
 					age,gender) VALUES(%s,%s,%s,%s,%s)"""
 			values = (user.useremail,user.firstname,user.secondname,user.age,
 					user.gender)
@@ -145,7 +145,7 @@ def register():
 
 		user.password = hashlib.md5(str(user.password).encode()).hexdigest()
 
-		sql = "UPDATE dice_9_.verified_users SET mobile_no = %s, app_token = %s, web_token = %s, password = %s, role = %s , register_dt = %s , status = 1"
+		sql = "UPDATE users_dice9_.verified_users SET mobile_no = %s, app_token = %s, web_token = %s, password = %s, role = %s , register_dt = %s , status = 1"
 		values = (user.mobile_no , token1_ , token2_ , user.password , user.role , date_time)
 		mycursor.execute(sql,values)
 		mycursor.fetchall()
@@ -154,7 +154,7 @@ def register():
 		mydb.disconnect()
 		return json.dumps({'success': 'true', 'msg': "Register Successful"})
 	except Exception as e:
-		return json.dumps({'success':'false','msg':"Internal Server Error"+str(e)})
+		return json.dumps({'success':'false','msg':"Some Error Occured"+str(e)})
 
 
 @users.route("/api/login",methods=['GET'])
@@ -175,7 +175,7 @@ def login():
 		mycursor= mydb.cursor()
 
 		# User Validation
-		sql = "SELECT status, logged_in_app, logged_in_web FROM dice_9_.verified_users WHERE useremail = %s AND password = %s"
+		sql = "SELECT status, logged_in_app, logged_in_web FROM users_dice9_.verified_users WHERE useremail = %s AND password = %s"
 		values = (useremail,password)
 		mycursor.execute(sql,values)
 		res = mycursor.fetchall()
@@ -205,7 +205,7 @@ def login():
 				mydb.disconnect()
 				return json.dumps({'success': 'false', 'msg': "You Are Already Logged In"})
 
-			sql = "UPDATE dice_9_.verified_users SET logged_in_app = 1, app_token = %s, last_login_app = %s WHERE useremail = %s"
+			sql = "UPDATE users_dice9_.verified_users SET logged_in_app = 1, app_token = %s, last_login_app = %s WHERE useremail = %s"
 		
 		# updating web_token
 		elif login_device == '1':
@@ -213,7 +213,7 @@ def login():
 				mydb.disconnect()
 				return json.dumps({'success': 'false', 'msg': "You Are Already Logged In Web"})
 
-			sql = "UPDATE dice_9_.verified_users SET logged_in_web = 1,web_token = %s, last_login_web = %s WHERE useremail = %s"
+			sql = "UPDATE users_dice9_.verified_users SET logged_in_web = 1,web_token = %s, last_login_web = %s WHERE useremail = %s"
 		
 		else:
 			mydb.disconnect()
@@ -228,7 +228,7 @@ def login():
 	
 	except Exception as e:
 		mydb.disconnect()
-		return json.dumps({'success':'false','msg':"Internal Server Error"+str(e)})
+		return json.dumps({'success':'false','msg':"Some Error Occured"+str(e)})
 
 @users.route("/api/logout",methods=['POST'])
 def logout():
@@ -244,9 +244,9 @@ def logout():
 		sql=''
 		#User Validation
 		if login_device == '0':
-			sql = "SELECT logged_in_app FROM dice_9_.verified_users WHERE useremail = %s AND app_token= %s"
+			sql = "SELECT logged_in_app FROM users_dice9_.verified_users WHERE useremail = %s AND app_token= %s"
 		elif login_device == '1':
-			sql = "SELECT logged_in_web FROM dice_9_.verified_users WHERE useremail = %s AND web_token= %s"
+			sql = "SELECT logged_in_web FROM users_dice9_.verified_users WHERE useremail = %s AND web_token= %s"
 		
 		values = (useremail , token)
 		mycursor.execute(sql,values)
@@ -258,11 +258,11 @@ def logout():
 
 		#SQL Injection
 		if login_device == '0':
-			sql = "UPDATE dice_9_.verified_users SET logged_in_app = 0, app_token = '{}'"
+			sql = "UPDATE users_dice9_.verified_users SET logged_in_app = 0, app_token = '{}'"
 			sql = sql.format(token_hex(16))
 		
 		elif login_device == '1':
-			sql = "UPDATE dice_9_.verified_users SET logged_in_web = 0, web_token = '{}'"
+			sql = "UPDATE users_dice9_.verified_users SET logged_in_web = 0, web_token = '{}'"
 			sql = sql.format(token_hex(16))
 
 		mycursor.execute(sql)
@@ -272,7 +272,7 @@ def logout():
 		return json.dumps({'success':'true','msg':"Logout Successfull"})
 
 	except Exception as e:
-		return json.dumps({'success':'false','msg':"Internal Server Error"})
+		return json.dumps({'success':'false','msg':"Some Error Occured"})
 
 
 
@@ -293,7 +293,7 @@ def add_administrator():
 		mycursor = mydb.cursor()
 
 		#Admin Validation
-		sql = "SELECT useremail FROM dice_9_.admin WHERE useremail = '{}' AND password = '{}'"
+		sql = "SELECT useremail FROM users_dice9_.admin WHERE useremail = '{}' AND password = '{}'"
 		sql = sql.format(obj.authoriser, obj.password)
 		mycursor.execute(sql)
 		mycursor.fetchall()
@@ -302,7 +302,7 @@ def add_administrator():
 			return json.dumps({'success': 'false', 'msg': "Access denied"})
 		
 		#SQL Injection
-		sql = """INSERT INTO dice_9_.admin (useremail,user_name,password,authorised_by,
+		sql = """INSERT INTO users_dice9_.admin (useremail,user_name,password,authorised_by,
 				authorised_at) VALUES (%s,%s,%s,%s,%s)"""
 		values = (obj.useremail,obj.username,obj.new_password,obj.authoriser,date_time)
 
@@ -311,4 +311,4 @@ def add_administrator():
 		mydb.disconnect()
 		return json.dumps({'success': 'true', 'msg': "Admin Added"})
 	except Exception as e:
-		return json.dumps({'success': 'false', 'msg': "Internal Server Error"})
+		return json.dumps({'success': 'false', 'msg': "Some Error Occured"})
