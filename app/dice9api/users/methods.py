@@ -52,3 +52,33 @@ def send_staff_request(mydb,username, useremail, token):
 			ttl-=1
 			if ttl==0:
 				raise ValueError("Mail Not Send || "+str(e))
+
+def send_new_admin_alert(mydb,new_admin_email,new_admin_name,authoriser,date_time):
+	ttl = 5
+	while True:
+		try:
+			# SQL --fetch admins
+			mycursor = mydb.cursor()
+			mycursor.execute("SELECT useremail,user_name from users_dice9_.admin")
+			admins_ = mycursor.fetchall()
+
+			#Parameter Intitialization
+			date_time = str(datetime.datetime.now()).split('.')[0]
+
+			#Email Handler
+			subject = f"URGENT: Security Alert - New Admin Added to the Organization"
+			sender = "DICE chitkara university"
+
+			for admin in admins_:
+
+				msg = Message(subject, sender=sender, recipients=[admin[0]])
+				msg.html = render_template("security_alert.html",new_admin_email=new_admin_email,
+											new_admin_name=new_admin_name,
+											authoriser=authoriser,
+											date_time=date_time)
+				mail.send(msg)
+			return
+		except Exception as e:
+			ttl-=1
+			if ttl==0:
+				raise ValueError("Mail Not Send || "+str(e))

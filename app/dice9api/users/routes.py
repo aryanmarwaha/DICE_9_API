@@ -7,7 +7,7 @@ from dice9api import mysql
 from dice9api.users.objects import RegisteringUser, RegisteringStudent
 from dice9api.users.objects import RegisteringAdmin, EnrollingUser
 from dice9api.users.methods import send_email_verification_otp
-from dice9api.users.methods import send_staff_request
+from dice9api.users.methods import send_staff_request,send_new_admin_alert
 
 from random import randint
 
@@ -292,6 +292,7 @@ def add_administrator():
 		mydb = establish_connection()
 		mycursor = mydb.cursor()
 
+
 		#Admin Validation
 		sql = "SELECT useremail FROM users_dice9_.admin WHERE useremail = '{}' AND password = '{}'"
 		sql = sql.format(obj.authoriser, obj.password)
@@ -300,15 +301,20 @@ def add_administrator():
 		if mycursor.rowcount == 0:
 			mydb.disconnect()
 			return json.dumps({'success': 'false', 'msg': "Access denied"})
-		
+
+		user_key = token_hex(4)
 		#SQL Injection
 		sql = """INSERT INTO users_dice9_.admin (useremail,user_name,password,authorised_by,
-				authorised_at) VALUES (%s,%s,%s,%s,%s)"""
-		values = (obj.useremail,obj.username,obj.new_password,obj.authoriser,date_time)
+				authorised_at,user_key) VALUES (%s,%s,%s,%s,%s,%s)"""
+		values = (obj.useremail,obj.username,obj.new_password,obj.authoriser,date_time,user_key)
 
 		mycursor.execute(sql,values)
+		send_new_admin_alert(mydb,obj.useremail,obj.username,obj.authoriser,date_time)
 		mydb.commit()
 		mydb.disconnect()
 		return json.dumps({'success': 'true', 'msg': "Admin Added"})
+	except mysql.connector.errors.IntegrityError:
+		return json.dumps({'success': 'false', 'msg': "Bad Parameters"})
+
 	except Exception as e:
-		return json.dumps({'success': 'false', 'msg': "Some Error Occured"})
+		return json.dumps({'success': 'false', 'msg': "Some Error Occured"+str(e)})

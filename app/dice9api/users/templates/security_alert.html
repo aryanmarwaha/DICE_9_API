@@ -1,0 +1,27 @@
+{% extends "mail_layout.html" %}
+{% block mail_content %}
+<div align="left" style="width: 600px; min-height: 500px; background-color: #FFFF;">
+	<center>
+		<img src="https://github.com/aryanmarwaha/aryanmarwaha/assets/102375260/17bb1ef7-d27f-460e-a92c-4e9357e59a1b" style="width:160px;">
+	</center>
+	<div style="display: inline-block; margin-top: 0.5rem; margin-left: 50px;width: 500px; font-size: 1.3rem; font-family: Arial; color: darkslategray;">
+		<p><span style="font-weight: 600; font-size: 1.4rem;">DICE Security Alert ⚠️⚠️</span>
+			<br>
+			<br>
+			We have added a new admin to our system. The specifics are discussed further down. Please take an action at your earliest interim. Thankyou 🙏<br>
+			<br>
+			<label>user-name : <span style="color: #CA6100; font-weight: 500;">{{new_admin_name}}</span></label>
+			<br>
+			<label>admin email : <span style="color: #CA6100; font-weight: 500;">{{new_admin_email}}</span></label>
+			<br>
+			<label>authorised by : <span style="color: #0434E0; font-weight: 500;">{{authoriser}}</span></label>
+			<br>
+			<label>authorised at : <span style="color: #0434E0; font-weight: 500;">{{date_time}}</span></label>
+		</p>
+		<br>
+		<center style="border-top: 2px solid grey;padding-top: 1.2rem; padding-bottom: 1.2rem;">
+			<label style="margin-bottom: 10px; display: inline-block; font-size: 0.9rem;">Stay vigilant, and let's keep our organization secure.</label>
+		</center>
+	</div>
+</div>
+{% endblock %}
