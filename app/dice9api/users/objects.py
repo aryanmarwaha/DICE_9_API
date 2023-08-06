@@ -42,3 +42,26 @@ class RegisteringAdmin:
 		self.new_password = nullSafe(request.form.get('new_password'))
 		self.authoriser = nullSafe(request.form.get('authoriser'))
 		self.password = nullSafe(request.form.get('password'))
+
+class Login_Form:
+	def __init__(self, request):
+		from dice9api import nullSafe, hashlib
+
+		self.useremail = nullSafe(request.form.get('useremail'))
+		self.password = nullSafe(request.form.get('password'))
+		self.password = hashlib.md5(self.password.encode()).hexdigest()
+		self.device = nullSafe(request.form.get('device'))
+
+		if self.device not in ['0','1']:
+			raise ValueError("device value not satisfied")
+
+class Validate_Session:
+	def __init__(self, request):
+		from dice9api import nullSafe
+
+		self.useremail = nullSafe(request.form.get('useremail'))
+		self.token = nullSafe(request.form.get('token'))
+		self.device = nullSafe(request.form.get('device'))
+
+		if self.device not in ['0','1']:
+			raise ValueError("device value not satisfied")

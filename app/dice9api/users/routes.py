@@ -1,15 +1,16 @@
 from dice9api import Blueprint
 from dice9api import establish_connection
 from dice9api import hashlib,token_hex,json
-from dice9api import request, datetime
+from dice9api import request,datetime,randint
 from dice9api import mysql
 
 from dice9api.users.objects import RegisteringUser, RegisteringStudent
 from dice9api.users.objects import RegisteringAdmin, EnrollingUser
+from dice9api.users.objects import Validate_Session, Login_Form
+
 from dice9api.users.methods import send_email_verification_otp
 from dice9api.users.methods import send_staff_request,send_new_admin_alert
 
-from random import randint
 
 # main :
 
@@ -80,7 +81,6 @@ def enroll_user():
 		return json.dumps({'success': 'false', 'msg': str(e)})
 	except Exception as e:
 		return json.dumps({'success': 'false', 'msg': "Some Error Occured"+str(e)})
-
 
 @users.route("/api/register",methods=['POST'])
 def register():
@@ -156,19 +156,14 @@ def register():
 	except Exception as e:
 		return json.dumps({'success':'false','msg':"Some Error Occured"+str(e)})
 
-
 @users.route("/api/login",methods=['GET'])
 def login():
 	#Parameter Initialization
-	useremail = request.form.get('useremail')
-	password = str(request.form.get('password'))
-
-	login_device = str(request.form.get('login_device'))
-
-	#Parameter processing
-	password = hashlib.md5(password.encode()).hexdigest()
-	date_time = datetime.datetime.now()
-
+	try:
+		req = Login_Form(request)
+		date_time = datetime.datetime.now()
+	except:
+		return json.dumps({'success':'false','msg':"Bad Parameters"})
 	try:
 		#Database Connection
 		mydb = establish_connection()
@@ -176,108 +171,84 @@ def login():
 
 		# User Validation
 		sql = "SELECT status, logged_in_app, logged_in_web FROM users_dice9_.verified_users WHERE useremail = %s AND password = %s"
-		values = (useremail,password)
+		values = (req.useremail,req.password)
 		mycursor.execute(sql,values)
 		res = mycursor.fetchall()
 		if mycursor.rowcount == 0:
 			mydb.disconnect()
 			return json.dumps({'success': 'false', 'msg': "Bad Parameters"})
-		
-		elif res[0][0]==0:
+		res = res[0]
+		if res[0]==0:
 			mydb.disconnect()
 			return json.dumps({'success': 'false', 'msg': "Register First"})
 
-		elif res[0][0]==2:
-			# pending----- for duration or if the suspension was over etc.
+		elif res[0]==2:
 			mydb.disconnect()
 			return json.dumps({'success': 'false', 'msg': "Account Suspended"})
-			
-		elif res[0][0]==3:
-			mydb.disconnect()
-			return json.dumps({'success': 'false', 'msg': "Account Freezed"})
-		
-		res = res[0]
-		secretToken = token_hex(16)
-		
-		# updating app_token
-		if login_device == '0':
-			if(res[1]==1):
-				mydb.disconnect()
-				return json.dumps({'success': 'false', 'msg': "You Are Already Logged In"})
 
-			sql = "UPDATE users_dice9_.verified_users SET logged_in_app = 1, app_token = %s, last_login_app = %s WHERE useremail = %s"
-		
-		# updating web_token
-		elif login_device == '1':
-			if(res[2]==1):
-				mydb.disconnect()
-				return json.dumps({'success': 'false', 'msg': "You Are Already Logged In Web"})
-
-			sql = "UPDATE users_dice9_.verified_users SET logged_in_web = 1,web_token = %s, last_login_web = %s WHERE useremail = %s"
-		
-		else:
-			mydb.disconnect()
-			return json.dumps({'success': 'false', 'msg': "Bad Parameters"})
-
-		values = (secretToken , date_time , useremail)
+		# Creating New Session
+		new_token = token_hex(16)
+		if req.device == '0':
+			sql = """UPDATE users_dice9_.verified_users SET logged_in_app = 1,\
+					 app_token = %s WHERE useremail = %s"""
+		if req.device == '1':
+			sql = """UPDATE users_dice9_.verified_users SET logged_in_web = 1,\
+					 web_token = %s WHERE useremail = %s"""
+		values = (new_token, req.useremail)
 		mycursor.execute(sql,values)
 		
 		mydb.commit()
 		mydb.disconnect()
-		return json.dumps({'success': 'true', 'msg': "Login Successfull", 'token': secretToken})
+		return json.dumps({'success': 'true', 'msg': "Login Successfull", 'token': new_token})
 	
 	except Exception as e:
+		print(str(e))
 		mydb.disconnect()
-		return json.dumps({'success':'false','msg':"Some Error Occured"+str(e)})
+		return json.dumps({'success':'false','msg':"Some Error Occured"})
 
 @users.route("/api/logout",methods=['POST'])
 def logout():
-	useremail = request.form.get('useremail')
-	token = request.form.get('token')
-	login_device = request.form.get('login_device')
-
+	#Parameter Initialization
+	try:
+		req = Validate_Session(request)
+		date_time = datetime.datetime.now()
+	except:
+		print("you")
+		return json.dumps({'success':'false','msg':"Bad Parameters"})
 	try:
 		#Database Connection
 		mydb = establish_connection()
 		mycursor = mydb.cursor()
 
-		sql=''
-		#User Validation
-		if login_device == '0':
-			sql = "SELECT logged_in_app FROM users_dice9_.verified_users WHERE useremail = %s AND app_token= %s"
-		elif login_device == '1':
-			sql = "SELECT logged_in_web FROM users_dice9_.verified_users WHERE useremail = %s AND web_token= %s"
+		#Session Validation
+		if req.device == '0':
+			sql = "SELECT useremail FROM users_dice9_.verified_users WHERE useremail = %s AND app_token= %s"
+		elif req.device == '1':
+			sql = "SELECT useremail FROM users_dice9_.verified_users WHERE useremail = %s AND web_token= %s"
 		
-		values = (useremail , token)
+		values = (req.useremail , req.token)
 		mycursor.execute(sql,values)
-		res = mycursor.fetchall()[0][0]
+		logged_in = mycursor.fetchall()
 
-		if (mycursor.rowcount == 0 or res != 1):
+		if (mycursor.rowcount == 0):
 			mydb.disconnect()
-			return json.dumps({'success':'false','msg':"Bad Parameters"})
+			return json.dumps({'success': 'false', 'msg': "Bad Parameters"})
 
-		#SQL Injection
-		if login_device == '0':
-			sql = "UPDATE users_dice9_.verified_users SET logged_in_app = 0, app_token = '{}'"
-			sql = sql.format(token_hex(16))
+		# Logging-Out User
+		if req.device == '0':
+			sql = "UPDATE users_dice9_.verified_users SET logged_in_app = 0, app_token = %s, last_login_app =%s"
+		elif req.device == '1':
+			sql = "UPDATE users_dice9_.verified_users SET logged_in_web = 0, web_token = %s, last_login_web =%s"
 		
-		elif login_device == '1':
-			sql = "UPDATE users_dice9_.verified_users SET logged_in_web = 0, web_token = '{}'"
-			sql = sql.format(token_hex(16))
-
-		mycursor.execute(sql)
+		values = (token_hex(16),date_time)
+		mycursor.execute(sql,values)
+		
 		mydb.commit()
-
 		mydb.disconnect()
 		return json.dumps({'success':'true','msg':"Logout Successfull"})
 
 	except Exception as e:
 		return json.dumps({'success':'false','msg':"Some Error Occured"})
-
-
-
-
-
 
 @users.route("/api/add_administrator",methods=['POST'])
 def add_administrator():

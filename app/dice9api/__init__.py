@@ -4,6 +4,7 @@ from flask_mail import Mail, Message
 from cryptography.fernet import Fernet
 import mysql.connector,datetime
 import hashlib,json,os
+from random import randint
 
 from secrets import token_hex
 
@@ -38,6 +39,8 @@ def nullSafe(var):
 	
 from dice9api.users.routes import users
 from dice9api.validation.routes import validate
+from dice9api.utils.routes import utils
 
 app.register_blueprint(users)
 app.register_blueprint(validate)
+app.register_blueprint(utils)

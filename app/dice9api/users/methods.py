@@ -8,7 +8,6 @@ def send_email_verification_otp(useremail, otp_token):
 			msg = Message("One Time Password for Email Verification is {}".format(otp_token),
 					sender="DICE chitkara university",
 					recipients=[useremail])
-
 			msg.body = f"One Time Password for Email Verification is {otp_token}. This OTP will expire with in 8 minutes."
 			msg.html = render_template("mail_verify_otp.html", otp_token=otp_token)
 			mail.send(msg)
