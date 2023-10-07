@@ -1,0 +1,32 @@
+version: '3'
+services:
+    dice_9_app:
+        build: ./app/
+        container_name: dice_9_app
+        restart: always
+        environment:
+            - DATABASE_NAME=mysql_db #same as Database-container
+            - DATABASE_USER=root # Defined while creating Database-container
+            - DATABASE_PASSWORD=root # Defined while creating Database-container
+            # This is needed for Flask-mail server
+            - MAIL_USERNAME= ${MAIL_USERNAME}
+            - MAIL_PASSWORD= ${MAIL_PASSWORD}
+        depends_on:
+            - mysql_db
+
+    nginx:
+        build: ./other/nginx/
+        container_name: nginx
+        restart: always
+        ports:
+            - "80:80"
+        depends_on:
+            - dice_9_app
+
+    mysql_db:
+        build: ./other/mysql_db/
+        container_name: mysql_db
+        restart: always
+        environment:
+            MYSQL_DATABASE: 'users_dice9_'
+            MYSQL_ROOT_PASSWORD: 'root'

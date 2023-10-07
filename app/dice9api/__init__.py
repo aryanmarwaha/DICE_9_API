@@ -15,8 +15,8 @@ app.config.update(
 	MAIL_SERVER='smtp.gmail.com',
 	MAIL_PORT=465,
 	MAIL_USE_SSL=True,
-	MAIL_USERNAME = os.environ.get('MAIL_SERVER_EMAILID'),
-	MAIL_PASSWORD = os.environ.get('MAIL_SERVER_EMAIL_PASSWORD')
+	MAIL_USERNAME = os.environ.get('MAIL_USERNAME'),
+	MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 )
 mail = Mail(app)
 
@@ -25,9 +25,9 @@ fernet = Fernet(enc_key)
 
 def establish_connection():
 	mydb = mysql.connector.connect(
-		host='localhost',
-		user='root',
-		password='root',
+		host=os.environ.get('DATABASE_NAME'),
+		user=os.environ.get('DATABASE_USER'),
+		password=os.environ.get('DATABASE_PASSWORD'),
 		database='users_dice9_'
 	)
 	return mydb

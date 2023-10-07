@@ -28,8 +28,6 @@ class RegisteringStudent:
 		self.branch = nullSafe(request.form.get('branch'))
 		self.hosteler = nullSafe(request.form.get('hosteler'))
 		self.address = nullSafe(request.form.get('address'))
-		self.interests = nullSafe(request.form.get('interests'))
-		self.skills = nullSafe(request.form.get('skills'))
 		self.open_to_work = nullSafe(request.form.get('open_to_work'))
 
 

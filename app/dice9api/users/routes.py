@@ -80,7 +80,7 @@ def enroll_user():
 	except ValueError as e:
 		return json.dumps({'success': 'false', 'msg': str(e)})
 	except Exception as e:
-		return json.dumps({'success': 'false', 'msg': "Some Error Occured"+str(e)})
+		return json.dumps({'success': 'false', 'msg': "Some Error Occured"})
 
 @users.route("/api/register",methods=['POST'])
 def register():
@@ -114,7 +114,7 @@ def register():
 					open_to_work) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
 			values = (user.useremail,user.firstname,user.secondname,user.age,user.gender,
 					student.rollno,student.branch,student.hosteler,student.address,
-					student.interests,student.skills,student.open_to_work)
+					student.open_to_work)
 			mycursor.execute(sql,values)
 
 		#user.role == guest 1 / staff 2
@@ -162,8 +162,8 @@ def login():
 	try:
 		req = Login_Form(request)
 		date_time = datetime.datetime.now()
-	except:
-		return json.dumps({'success':'false','msg':"Bad Parameters"})
+	except Exception as e:
+		return json.dumps({'success':'false','msg':"Bad Parameters" + str(e)})
 	try:
 		#Database Connection
 		mydb = establish_connection()
