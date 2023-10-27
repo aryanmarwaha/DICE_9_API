@@ -1,4 +1,4 @@
-# DICE_9_API
+# DICE_9_API <i>[BETA]</i>
 The **DICE_9_API** is a powerful and efficient Flask-based RESTful application developed specifically for the **Department of DICE** (Department of Interdisciplinary Courses in Engineering) to streamline data management and collaboration processes. This API serves as the backbone for department's mobile application and website as well as various data-related operations within the department.
 <br><br>
 <img src="https://github.com/aryanmarwaha/aryanmarwaha/assets/102375260/17bb1ef7-d27f-460e-a92c-4e9357e59a1b" height="70" width="">
