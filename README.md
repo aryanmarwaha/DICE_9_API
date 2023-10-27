@@ -21,7 +21,7 @@ The **DICE_9_API** is a crucial component in empowering the **Department of DICE
 
 ## Getting Started
 
-To get started with the **DICE_9_API**, please follow the instructions in the [Installation Guide](https://yourrepository.com/docs/installation) and refer to the [API Documentation](https://yourrepository.com/docs/api) for details on how to use the endpoints.
+To get started with the **DICE_9_API**, please follow the instructions in the [Installation Guide](https://github.com/aryanmarwaha/DICE_9_API/docs/) and refer to the [API Documentation](https://github.com/aryanmarwaha/DICE_9_API/docs/api) for details on how to use the endpoints.
 
 
 *© 2023 Department of DICE | [DICE_9_API Repository](https://github.com/aryanmarwaha/DICE_9_API/)*
