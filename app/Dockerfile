@@ -19,7 +19,7 @@ pip3 install --no-cache-dir -r requirements.txt uwsgi
 #Setting Environment variables
 # ENV MAIL_USERNAME # this you will get from docker-compose.yml
 # ENV MAIL_PASSWORD # this you will get from docker-compose.yml
-ENV ENCRYPTION_KEY nBGYyqlYDwC9_hlB_Gdp62mDobA7frfMyUmsweYmQz4=
+# ENV ENCRYPTION_KEY # this you will get from docker-compose.yml
 
 # run -run.py as soon as container launches
 CMD ["uwsgi","app.ini"]
